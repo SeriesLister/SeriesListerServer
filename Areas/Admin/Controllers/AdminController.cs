@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AnimeListings.Areas.Admin.Controllers
 {
-    //[Authorize(Roles = "Admin")]
+    ////[Authorize(Roles = "Admin")]
     [ApiController]
     [Route("/Admin/[Controller]")]
     public abstract class AdminController : Controller { }
