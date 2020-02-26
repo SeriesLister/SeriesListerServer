@@ -1,0 +1,85 @@
+﻿@model AnimeListings.Helpers.PaginatedList<AnimeListings.Models.AnimeSeries>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<form class="form-inline" style="float: left;" method="get" asp-area="Admin" asp-action="Index" asp-controller="AnimeSeries">
+    <input class="form-control mb-3" type="text" name="search" placeholder="Search Anime" />
+    <input class="btn btn-primary mb-3" style="margin-left: 4px;" type="submit" value="Search" />
+</form>
+<form style="float: left; padding-left: 4px;" method="get" asp-area="Admin" asp-action="Index" asp-controller="AnimeSeries">
+    <input class="btn btn-danger" type="submit" value="Clear" />
+</form>
+<br />
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                English Title
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Episodes
+            </th>
+            <th>
+                Air Date
+            </th>
+            <th>
+                Finish Date
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EnglishTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Episodes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReleaseDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FinishDate)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+        @{
+            var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+            var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index"
+    asp-route-page="@(Model.PageIndex - 1)"
+   asp-route-search="@ViewData["search"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-page="@(Model.PageIndex + 1)"
+   asp-route-search="@ViewData["search"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

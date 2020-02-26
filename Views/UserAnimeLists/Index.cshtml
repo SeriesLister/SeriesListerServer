@@ -1,0 +1,35 @@
+﻿@model IEnumerable<AnimeListings.Models.UserAnimeList>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Title
+            </th>
+            <th>
+                Title Episodes
+            </th>
+            <th>Current Episode</th>
+            <th>Status</th>
+            <th><i class="fas fa-plus-square" style="font-size: 1.5em;"></i></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Demon Slayer</td>
+            <td>26</td>
+            <td>4</td>
+            <td>Watching</td>
+        </tr>
+
+    </tbody>
+</table>

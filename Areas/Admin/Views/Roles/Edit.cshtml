@@ -1,0 +1,26 @@
+﻿@model AnimeListings.ViewModels.Roles.RoleDetailsViewModel;
+
+@{
+    ViewData["Title"] = "Edit";
+}
+<h2>Editing Role @Model.RoleName</h2>
+<div>
+    <hr />
+
+    <form asp-action="Edit">
+
+        <div class="form-group col-md-8" style="padding-left: 0;">
+            <label asp-for="NewRoleName"></label>
+            <input asp-for="NewRoleName" class="form-control" />
+        </div>
+
+        <div class="form-check">
+            <input asp-for="UpdateAllUsers" class="form-check-input" />
+            <label asp-for="UpdateAllUsers" checked="true" class="form-check-label"></label>
+        </div>
+        <div style="margin-bottom: 8px;"></div>
+        <input type="hidden" asp-for="RoleId" />
+        <input type="submit" value="Edit" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>
