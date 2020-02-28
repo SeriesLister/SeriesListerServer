@@ -45,51 +45,25 @@ namespace AnimeListings.Controllers
             return result;
         }
 
-        // GET: AnimeSeries/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var animeSeries = await _context.AnimeSeries
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (animeSeries == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(animeSeries);
-        //}
-
-        // GET: AnimeSeries/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: AnimeSeries/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,EnglishTitle,Type,Episodes,ReleaseDate,FinishDate")] AnimeSeries animeSeries)
+        [HttpPost("create")]
+        public async Task<ActionResult> Create([Bind("EnglishTitle,Type,Episodes,ReleaseDate,FinishDate")] AnimeSeries animeSeries)
         {
             if (ModelState.IsValid)
             {
+                Console.WriteLine(animeSeries.EnglishTitle);
+                var reponse = new StatusReponse();
                 _context.Add(animeSeries);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                reponse.Result = true;
+                return Ok(Response);
             }
-            return View(animeSeries);
+            return NoContent();
         }
 
         // GET: AnimeSeries/Edit/5
         [HttpGet("edit/{id}")]
         public async Task<ActionResult<AnimeSeries>> GetDetails(int? id)
         {
-            Console.WriteLine("ID: " + id);
             if (id == null)
             {
                 return NoContent();
@@ -112,7 +86,6 @@ namespace AnimeListings.Controllers
         {
             if (id == null || id != animeSeries.Id)
             {
-                Console.WriteLine("Id dont match on put edit request");
                 return NotFound();
             }
 
@@ -138,33 +111,26 @@ namespace AnimeListings.Controllers
             return NotFound();
         }
 
-        // GET: AnimeSeries/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // DELETE: AnimeSeries/Delete/5
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
+            Console.WriteLine("trying to delete: " + id);
+            var response = new StatusReponse();
+            if (id == 0)
             {
-                return NotFound();
+                return Ok(response);
             }
 
-            var animeSeries = await _context.AnimeSeries
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var animeSeries = await _context.AnimeSeries.FindAsync(id);
             if (animeSeries == null)
             {
-                return NotFound();
+                return Ok(response);
             }
-
-            return View(animeSeries);
-        }
-
-        // POST: AnimeSeries/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var animeSeries = await _context.AnimeSeries.FindAsync(id);
             _context.AnimeSeries.Remove(animeSeries);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            response.Result = true;
+            return Ok(response);
         }
 
         private bool AnimeSeriesExists(int id)

@@ -8,7 +8,7 @@ namespace AnimeListings.ViewModels
     public class StatusReponse
     {
 
-        public bool Result { get; set; }
+        public bool Result { get; set; } = false;
 
     }
 }
