@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AnimeListings.Data;
 using AnimeListings.Models;
@@ -46,16 +44,15 @@ namespace AnimeListings.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult> Create([Bind("EnglishTitle,Type,Episodes,ReleaseDate,FinishDate")] AnimeSeries animeSeries)
+        public async Task<IActionResult> Create([FromBody]AnimeSeries animeSeries)
         {
             if (ModelState.IsValid)
             {
-                Console.WriteLine(animeSeries.EnglishTitle);
-                var reponse = new StatusReponse();
+                var response = new StatusReponse();
                 _context.Add(animeSeries);
                 await _context.SaveChangesAsync();
-                reponse.Result = true;
-                return Ok(Response);
+                response.Result = true;
+                return Ok(new { response, animeSeries.Id });
             }
             return NoContent();
         }
