@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AnimeListings.Areas.Admin.Controllers
 {
+    [ApiController]
     public class UserManagerController : AdminController
     {
 
@@ -23,11 +24,12 @@ namespace AnimeListings.Areas.Admin.Controllers
             Context = context;
         }
 
-        public async Task<IActionResult> Index(int? page)
+        [HttpGet]
+        public async Task<ActionResult<List<UserListedViewModel>>> Index(int? page)
         {
             var users = await PaginatedList<SeriesUser>.CreateAsync(UserManager.Users, page ?? 1, 50);
 
-            var model = new List<UserListedViewModel>();
+            var userModel = new List<UserListedViewModel>();
 
             foreach (var user in users)
             {
@@ -40,9 +42,9 @@ namespace AnimeListings.Areas.Admin.Controllers
                     DisplayName = user.UserName,
                     Permissions = userRight
                 };
-                model.Add(User);
+                userModel.Add(User);
             }
-            return View(model);
+            return Ok(new { userModel, users.TotalPages });
         }
 
         public async Task<IActionResult> Details(string id)

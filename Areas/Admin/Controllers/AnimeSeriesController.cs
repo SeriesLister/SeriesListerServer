@@ -44,7 +44,7 @@ namespace AnimeListings.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody]AnimeSeries animeSeries)
+        public async Task<ActionResult> Create([FromBody]AnimeSeries animeSeries)
         {
             if (ModelState.IsValid)
             {
