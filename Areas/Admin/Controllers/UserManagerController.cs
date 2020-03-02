@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AnimeListings.Data;
 using AnimeListings.Helpers;
+using AnimeListings.ViewModels;
 using AnimeListings.ViewModels.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,10 @@ namespace AnimeListings.Areas.Admin.Controllers
     {
 
         private readonly UserManager<SeriesUser> UserManager;
-        private readonly DatabaseContext Context;
 
-        public UserManagerController(UserManager<SeriesUser> userManager, DatabaseContext context)
+        public UserManagerController(UserManager<SeriesUser> userManager)
         {
             UserManager = userManager;
-            Context = context;
         }
 
         [HttpGet]
@@ -37,7 +36,7 @@ namespace AnimeListings.Areas.Admin.Controllers
 
                 var User = new UserListedViewModel()
                 {
-                    UserId = user.Id,
+                    Id = user.Id,
                     Email = user.Email,
                     DisplayName = user.UserName,
                     Permissions = userRight
@@ -47,33 +46,8 @@ namespace AnimeListings.Areas.Admin.Controllers
             return Ok(new { userModel, users.TotalPages });
         }
 
-        public async Task<IActionResult> Details(string id)
-        {
-            if (id.Length == 0 || id == null)
-            {
-                return RedirectToAction("Index", "UserManager");
-            }
-
-            var user = await UserManager.FindByIdAsync(id);
-
-            if (user == null)
-            {
-                return RedirectToAction("Index", "UserManager");
-            }
-
-            var UserRights = await UserManager.GetRolesAsync(user);
-            var model = new UserManagerDetailsViewModel
-            {
-                Email = user.Email,
-                DisplayName = user.UserName,
-                Id = user.Id,
-                Permissions = UserRights
-            };
-
-            return View(model);
-        }
-
-        public async Task<IActionResult> Edit(string id)
+        [HttpGet("edit/{id}")]
+        public async Task<ActionResult<UserManagerEditViewModel>> Edit(string id)
         {
             if (id.Length == 0 || id == null)
             {
@@ -107,12 +81,12 @@ namespace AnimeListings.Areas.Admin.Controllers
                 Permissions = stringBuilder.ToString()
             };
 
-            return View(model);
+            return Ok(model);
         }
 
 
-        [HttpPost, ActionName("Edit")]
-        public async Task<IActionResult> ConfirmDetails(UserManagerEditViewModel model)
+        [HttpPut("edit/{id}")]
+        public async Task<ActionResult> ConfirmDetails(UserManagerEditViewModel model)
         {
             //All users should have User permission by default
             if (model.Permissions == null || model.Permissions.Length == 0)
@@ -127,6 +101,7 @@ namespace AnimeListings.Areas.Admin.Controllers
                 user.Email = model.Email;
                 user.UserName = model.DisplayName;
 
+                var response = new StatusReponse();
                 var update = await UserManager.UpdateAsync(user);
                 var OldPermissions = await UserManager.GetRolesAsync(user);
 
@@ -135,11 +110,38 @@ namespace AnimeListings.Areas.Admin.Controllers
 
                 if (update.Succeeded && AddNewPermissions.Succeeded && RemoveOldPermissions.Succeeded)
                 {
-                    return RedirectToAction("Edit", "UserManager", model.Id);
+                    response.Result = true;
+                    return Ok(response);
                 }
             }
 
-            return View();
+            return NoContent();
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<ActionResult> Delete(string id)
+        {
+            if (id.Length == 0 || id == null)
+            {
+                return NoContent();
+            }
+
+            var user = await UserManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NoContent();
+            }
+
+            var deletePending = await UserManager.DeleteAsync(user);
+            if (deletePending.Succeeded)
+            {
+                var response = new StatusReponse
+                {
+                    Result = true
+                };
+                return Ok(response);
+            }
+            return NoContent();
         }
 
     }

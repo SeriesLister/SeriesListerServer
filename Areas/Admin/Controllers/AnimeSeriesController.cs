@@ -112,7 +112,6 @@ namespace AnimeListings.Controllers
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            Console.WriteLine("trying to delete: " + id);
             var response = new StatusReponse();
             if (id == 0)
             {
