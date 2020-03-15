@@ -12,7 +12,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AnimeListings.Areas.Admin.Controllers
 {
-    public class RolesController : AdminController
+    [Area("admin")]
+    [Route("/admin/roles")]
+    public class RolesController : Controller
     {
 
         private readonly RoleManager<IdentityRole> rolesManager;
@@ -28,18 +30,19 @@ namespace AnimeListings.Areas.Admin.Controllers
             userManager = UserManager;
         }
 
+        [HttpGet("/")]
         public IActionResult Index()
         {
             return View(rolesManager.Roles);
         }
 
-        [HttpGet]
+        [HttpGet("create")]
         public IActionResult Create()
         {
             return View();
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> Create(RoleCreateViewModel createViewModel)
         {
             if (ModelState.IsValid)

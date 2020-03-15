@@ -11,9 +11,14 @@ using AnimeListings.Data;
 using Microsoft.AspNetCore.Identity;
 using AnimeListings.Models.ViewModels;
 using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace AnimeListings.Controllers
 {
+    [ApiController]
+    [Route("Home")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -131,21 +136,7 @@ namespace AnimeListings.Controllers
             return RedirectToAction("Login");
         }
 
-        [HttpGet, ActionName("Login")]
-        public async Task<IActionResult> LoginAsync(LoginViewModel model)
-        {
-            if (IsUserLoggedIn())
-            {
-                return RedirectToAction("Index", "User");
-            }
-
-            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            Console.WriteLine(model.ExternalLogins.Count);
-
-            return View(model);
-        }
-
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (IsUserLoggedIn())
@@ -160,21 +151,38 @@ namespace AnimeListings.Controllers
                 if (user != null)
                 {
                     //is persisent is the remember me option
-                    var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, false);
-
+                    var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
                     if (result.Succeeded)
                     {
-                        return RedirectToAction("Index", "User");
+                        var token = GenerateJSONWebToken(user);
+                        return Ok(new { token, user.Email, user.UserName });
                     }
                 }
-
-                ModelState.AddModelError("", "Invalid Email Address or Password");
-
             }
 
-            return View();
+            return Problem(detail: "Invalid Email Address or Password");
         }
 
+        private string GenerateJSONWebToken(SeriesUser user)
+        {
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
+            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Id.ToString())
+            };
+            var tokeOptions = new JwtSecurityToken(
+                issuer: "http://localhost:44314",
+                audience: "http://localhost:44314",
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: signinCredentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+        }
+
+        [HttpGet("logout")]
         public async Task<IActionResult> Logout()
         {
             if (IsUserLoggedIn())

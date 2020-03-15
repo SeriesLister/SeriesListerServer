@@ -9,6 +9,8 @@ using AnimeListings.Helpers;
 using AnimeListings.Areas.Admin.Controllers;
 using AnimeListings.ViewModels.UserAnimeList;
 using AnimeListings.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using AnimeListings.Filters;
 
 namespace AnimeListings.Controllers
 {
@@ -26,6 +28,7 @@ namespace AnimeListings.Controllers
         [HttpGet]
         public async Task<ActionResult<AnimeViewModel>> Index(int? page, string search)
         {
+            Console.WriteLine("Loading List");
             var series = from anime in _context.AnimeSeries
                          select anime;
 
@@ -41,7 +44,7 @@ namespace AnimeListings.Controllers
                 LastPage = seriesTest.TotalPages
             };
             return result;
-        }
+        }//
 
         [HttpPost("create")]
         public async Task<ActionResult> Create([FromBody]AnimeSeries animeSeries)
