@@ -19,11 +19,5 @@ namespace AnimeListings.Models.ViewModels
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [Required]
-        [Display(Name = "Confirm Password")]
-        [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Passwords don't match")]
-        public string ConfirmPassword { get; set; }
-
     }
 }

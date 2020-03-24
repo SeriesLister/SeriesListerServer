@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using AnimeListings.Models;
 using Microsoft.AspNetCore.Authorization;
 using AnimeListings.Data;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +15,7 @@ using System.IdentityModel.Tokens.Jwt;
 namespace AnimeListings.Controllers
 {
     [ApiController]
-    [Route("Home")]
+    [Route("[Controller]")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -34,35 +31,11 @@ namespace AnimeListings.Controllers
             _signInManager = signInManager;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult Register()
-        {
-            if (IsUserLoggedIn())
-            {
-                return RedirectToAction("Index", "User");
-            }
-
-            return View();
-        }
-
-        [HttpPost]
+        [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(RegistrationViewModel model)
         {
-            if (IsUserLoggedIn())
-            {
-                return RedirectToAction("Index", "User");
-            }
-
+            Console.WriteLine("email: " + model.Email + " : display: " + model.DisplayName + " : password: "+ model.Password);
             if (ModelState.IsValid)
             {
                 var user = new SeriesUser()
@@ -75,20 +48,19 @@ namespace AnimeListings.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, "User");
-                    return RedirectToAction("Login");
+                    return Ok();
                 }
 
-                foreach (var errors in result.Errors)
+                StringBuilder errors = new StringBuilder();
+                foreach (var error in result.Errors)
                 {
-                    if (errors.Code.Contains("UserName", StringComparison.OrdinalIgnoreCase))
-                        ModelState.AddModelError("DisplayName", errors.Description);
-                    else if (errors.Code.Contains("Email", StringComparison.OrdinalIgnoreCase))
-                        ModelState.AddModelError("Email", errors.Description);
-                    else
-                        ModelState.AddModelError("", errors.Description);
+                    errors.Append(error.Description);
+                    errors.Append(" : ");
                 }
+
+                return Problem(detail: errors.ToString(0, errors.Length - 3));
             }
-            return View();
+            return NotFound();
         }
 
         [AllowAnonymous]
@@ -137,20 +109,15 @@ namespace AnimeListings.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (IsUserLoggedIn())
-            {
-                return RedirectToAction("Index", "User");
-            }
-
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
 
                 if (user != null)
                 {
-                    //is persisent is the remember me option
                     var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
                     if (result.Succeeded)
                     {
@@ -180,36 +147,6 @@ namespace AnimeListings.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-        }
-
-        [HttpGet("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            if (IsUserLoggedIn())
-            {
-                await _signInManager.SignOutAsync();
-            }
-            return Redirect("Index");
-        }
-
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult AccessDenied()
-        {
-
-            return View();
-        }
-
-        private bool IsUserLoggedIn()
-        {
-            return User.Identity.IsAuthenticated;
         }
 
     }
