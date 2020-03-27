@@ -19,15 +19,9 @@ namespace AnimeListings.Areas.Admin.Controllers
 
         private readonly RoleManager<IdentityRole> rolesManager;
 
-        private readonly DatabaseContext context;
-
-        private readonly UserManager<SeriesUser> userManager;
-
-        public RolesController(RoleManager<IdentityRole> RoleManager, DatabaseContext databaseContext, UserManager<SeriesUser> UserManager)
+        public RolesController(RoleManager<IdentityRole> RoleManager)
         {
             rolesManager = RoleManager;
-            context = databaseContext;
-            userManager = UserManager;
         }
 
         [HttpGet("/")]

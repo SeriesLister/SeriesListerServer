@@ -33,10 +33,8 @@ namespace AnimeListings
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
             services.AddMvc(options =>
            {
-               //options.Filters.Add<PermissionsFilter>();
                options.EnableEndpointRouting = false;
            });
             services.AddDbContext<DatabaseContext>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
@@ -53,16 +51,6 @@ namespace AnimeListings
             })
             .AddEntityFrameworkStores<DatabaseContext>()
             .AddDefaultTokenProviders();
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.Cookie.HttpOnly = true;
-                options.ExpireTimeSpan = TimeSpan.FromDays(30);
-                options.LogoutPath = new PathString("/Home/Logout");
-                options.LoginPath = new PathString("/Home/Login");
-                options.AccessDeniedPath = new PathString("/Home/AccessDenied");
-                options.SlidingExpiration = true;
-            });
 
             services.AddAuthentication(opt => {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -92,7 +80,6 @@ namespace AnimeListings
         public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
             app.UseAuthentication();
-            app.UseAuthorization();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -115,24 +102,14 @@ namespace AnimeListings
             app.UseStaticFiles();
 
             app.UseRouting();
-
-            //app.UseEndpoints(endpoints =>
-            //{
-
-            //    endpoints.MapControllerRoute(
-            //        name: "default",
-            //        pattern: "{controller=Home}/{action=Index}/{id?}");
-            //});
-            app.UseMvc(routes =>
+            app.UseAuthorization();//has to be between both of these
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                  name: "areas",
-                  template: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
-                  );
 
-                routes.MapRoute(
-                   name: "default",
-                   template: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}"
+                );
             });
         }
     }

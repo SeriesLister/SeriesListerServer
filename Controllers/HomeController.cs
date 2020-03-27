@@ -142,7 +142,7 @@ namespace AnimeListings.Controllers
                 issuer: "http://localhost:44314",
                 audience: "http://localhost:44314",
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddMinutes(1),
                 signingCredentials: signinCredentials
             );
 
