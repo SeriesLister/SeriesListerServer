@@ -11,6 +11,10 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using AnimeListings.Tasks;
+using AnimeListings.ViewModels;
+using AnimeListings.Models;
+using System.Linq;
 
 namespace AnimeListings.Controllers
 {
@@ -21,21 +25,66 @@ namespace AnimeListings.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly SignInManager<SeriesUser> _signInManager;
         private readonly UserManager<SeriesUser> _userManager;
+        private readonly DatabaseContext _context;
+        private readonly JWTGenerator _JWTGenerator;
 
         public HomeController(ILogger<HomeController> logger,
             UserManager<SeriesUser> userManager,
-            SignInManager<SeriesUser> signInManager)
+            SignInManager<SeriesUser> signInManager,
+            JWTGenerator jwtToken,
+            DatabaseContext context)
         {
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
+            _JWTGenerator = jwtToken;
+        }
+
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RefreshTokens(RefreshTokenView refreshTokenView)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            Console.WriteLine("Refreshing Token");
+
+            SeriesUser user = await _userManager.FindByEmailAsync(refreshTokenView.Email);
+
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var refreshToken = _context.RefreshTokens.SingleOrDefault(m => m.Token == refreshTokenView.RefreshToken);
+
+            if (refreshToken == null || !refreshToken.IsValid() || refreshToken.Email != user.Email)
+            {
+                if (refreshToken != null)
+                {
+                    _context.RefreshTokens.Remove(refreshToken);
+                    await _context.SaveChangesAsync();
+                }
+                return Unauthorized();
+            }
+
+            refreshToken.Token = Guid.NewGuid().ToString();
+            refreshToken.Provided = DateTime.UtcNow;
+
+            _context.RefreshTokens.Update(refreshToken);
+            await _context.SaveChangesAsync();
+            string token = _JWTGenerator.GenerateEncodedToken(user.Id);
+
+            return Ok(new { token, refreshToken = refreshToken.Token.ToString() });
         }
 
         [HttpPost("register")]
         [AllowAnonymous]
         public async Task<IActionResult> Register(RegistrationViewModel model)
         {
-            Console.WriteLine("email: " + model.Email + " : display: " + model.DisplayName + " : password: "+ model.Password);
+            Console.WriteLine("email: " + model.Email + " : display: " + model.DisplayName + " : password: " + model.Password);
             if (ModelState.IsValid)
             {
                 var user = new SeriesUser()
@@ -82,7 +131,8 @@ namespace AnimeListings.Controllers
             if (isUserSignedIn.Succeeded)
             {
                 return RedirectToAction("Index", "User");
-            } else
+            }
+            else
             {
                 SeriesUser user = new SeriesUser
                 {
@@ -121,33 +171,34 @@ namespace AnimeListings.Controllers
                     var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
                     if (result.Succeeded)
                     {
-                        var token = GenerateJSONWebToken(user);
-                        return Ok(new { token, user.Email, user.UserName });
+                        string token = _JWTGenerator.GenerateEncodedToken(user.Id);
+                        string refreshToken = await GenerateRefreshToken(user.Email);
+                        
+                        return Ok(new { token, user.Email, user.UserName, refreshToken });
                     }
                 }
             }
-
             return Problem(detail: "Invalid Email Address or Password");
         }
 
-        private string GenerateJSONWebToken(SeriesUser user)
+        private async Task<string> GenerateRefreshToken(string email)
         {
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
-            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-            var claims = new List<Claim>
+            RefreshToken refreshToken = new RefreshToken
             {
-                new Claim(ClaimTypes.Name, user.Id.ToString())
+                Email = email,
+                Token = Guid.NewGuid().ToString()
             };
-            var tokeOptions = new JwtSecurityToken(
-                issuer: "http://localhost:44314",
-                audience: "http://localhost:44314",
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(1),
-                signingCredentials: signinCredentials
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+            var refreshSearch = _context.RefreshTokens.FirstOrDefault(m => m.Email == email);
+            if (refreshSearch != null)
+            {
+                refreshSearch.Token = refreshToken.Token;
+                _context.RefreshTokens.Update(refreshSearch);
+            } else
+            {
+                _context.RefreshTokens.Add(refreshToken);
+            }
+            await _context.SaveChangesAsync();
+            return refreshToken.Token.ToString();
         }
-
     }
 }

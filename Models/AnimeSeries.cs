@@ -25,5 +25,7 @@ namespace AnimeListings.Models
         [Display(Name = "Finish Date")]
         [Column(TypeName = "Date")]//converts to short time 'MM/DD/YYYY'
         public DateTime FinishDate { get; set; }
+
+        public byte[] ImageData { get; set; }
     }
 }

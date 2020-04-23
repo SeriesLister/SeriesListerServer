@@ -32,7 +32,7 @@ namespace AnimeListings.Controllers
             var series = from anime in _context.AnimeSeries
                          select anime;
 
-            if (!String.IsNullOrEmpty(search))
+            if (!string.IsNullOrEmpty(search))
             {
                 series = series.Where(series => series.EnglishTitle.Contains(search, StringComparison.OrdinalIgnoreCase));
                 ViewData["search"] = search;
@@ -62,7 +62,7 @@ namespace AnimeListings.Controllers
 
         // GET: AnimeSeries/Edit/5
         [HttpGet("edit/{id}")]
-        public async Task<ActionResult<AnimeSeries>> GetDetails(int? id)
+        public async Task<ActionResult<AnimeSeriesViewModel>> GetDetails(int? id)
         {
             if (id == null)
             {
@@ -75,20 +75,20 @@ namespace AnimeListings.Controllers
                 return NoContent();
             }
 
-            return animeSeries;
+            return ConvertToSeriesImage(animeSeries);
         }
 
         // POST: AnimeSeries/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPut("edit/{id}")]
-        public async Task<IActionResult> Edit(int? id, AnimeSeries animeSeries)
+        public async Task<IActionResult> Edit(int? id, AnimeSeriesViewModel animeSeries)
         {
             if (id == null || id != animeSeries.Id)
             {
                 return NotFound();
             }
-
+            
             if (ModelState.IsValid)
             {
                 var reponse = new StatusReponse();
@@ -96,10 +96,10 @@ namespace AnimeListings.Controllers
                 {
                     return NotFound();
                 }
-                 
+
                 try
                 {
-                    _context.Update(animeSeries);
+                    _context.Update(ConvertFromSeriesImage(animeSeries));
                     await _context.SaveChangesAsync();
                     reponse.Result = true;
                 }
@@ -135,6 +135,36 @@ namespace AnimeListings.Controllers
         private bool AnimeSeriesExists(int id)
         {
             return _context.AnimeSeries.Any(e => e.Id == id);
+        }
+
+        private AnimeSeriesViewModel ConvertToSeriesImage(AnimeSeries animeSeries)
+        {
+
+            return new AnimeSeriesViewModel
+            {
+                EnglishTitle = animeSeries.EnglishTitle,
+                Episodes = animeSeries.Episodes,
+                FinishDate = animeSeries.FinishDate,
+                Id = animeSeries.Id,
+                ImageData = animeSeries.ImageData == null ? null : Convert.ToBase64String(animeSeries.ImageData),
+                ReleaseDate = animeSeries.ReleaseDate,
+                Type = animeSeries.Type
+            };
+
+        }
+
+        private AnimeSeries ConvertFromSeriesImage(AnimeSeriesViewModel animeSeries)
+        {
+            return new AnimeSeries
+            {
+                EnglishTitle = animeSeries.EnglishTitle,
+                Episodes = animeSeries.Episodes,
+                FinishDate = animeSeries.FinishDate,
+                Id = animeSeries.Id,
+                ImageData = animeSeries.ImageData == null ? null : Convert.FromBase64String(Utils.GetSafeBase64ImageString(animeSeries.ImageData)),
+                ReleaseDate = animeSeries.ReleaseDate,
+                Type = animeSeries.Type
+            };
         }
     }
 }

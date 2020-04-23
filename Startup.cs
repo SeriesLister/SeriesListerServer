@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AnimeListings.Data;
 using AnimeListings.Filters;
+using AnimeListings.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -74,6 +75,7 @@ namespace AnimeListings
                 });
 
             services.AddScoped<PermissionsFilter>();
+            services.AddScoped<JWTGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

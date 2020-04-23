@@ -3,14 +3,16 @@ using System;
 using AnimeListings.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AnimeListings.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20200417062805_refresh token 1")]
+    partial class refreshtoken1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,29 +116,6 @@ namespace AnimeListings.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AnimeSeries");
-                });
-
-            modelBuilder.Entity("AnimeListings.Models.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.Property<DateTime>("Provided")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("Revoked")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("Token")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("AnimeListings.Models.UserAnimeList", b =>

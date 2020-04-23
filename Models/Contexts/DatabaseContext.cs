@@ -27,5 +27,7 @@ namespace AnimeListings.Data
 
         public DbSet<AnimeSeries> AnimeSeries { get; set; }
 
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
     }
 }
