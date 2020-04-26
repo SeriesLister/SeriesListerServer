@@ -25,7 +25,7 @@ namespace AnimeListings.Seeds
                 return;
             }
 
-            String JsonFile = File.ReadAllText("C:/Users/tristan/source/repos/AnimeListings/Data/json/series-info.json");
+            String JsonFile = File.ReadAllText("/home/tristan/AnimeListings/AnimeListingsServer/Data/json/series-info.json");
             var root = JsonDocument.Parse(JsonFile).RootElement.GetProperty("animeData");
             for (int i = 0; i < root.GetArrayLength(); i++)
             {

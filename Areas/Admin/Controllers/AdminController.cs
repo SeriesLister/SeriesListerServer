@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AnimeListings.Areas.Admin.Controllers
 {
-    [PermissionsFilter(Permissions = "admin")]
+    //[PermissionsFilter(Permissions = "admin")]
     [ApiController]
     [Route("/Admin/[Controller]")]
     public abstract class AdminController : Controller { }

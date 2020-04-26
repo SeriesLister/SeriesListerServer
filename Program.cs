@@ -24,6 +24,7 @@ namespace AnimeListings
                 try
                 {
                     AnimeSeriesSeeds.SeedData(services);
+                    RolesSeed.SeedData(services);
                 }
                 catch (Exception e)
                 {
