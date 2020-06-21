@@ -1,9 +1,8 @@
-﻿using System;
+﻿using AnimeListings.Models.Anime;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AnimeListings.Models
 {
@@ -16,7 +15,7 @@ namespace AnimeListings.Models
 
         public string Type { get; set; }
 
-        public int Episodes { get; set; }
+        public int Seasons { get; set; }
 
         [Display(Name = "Air Date")]
         [Column(TypeName = "Date")]//converts to short time 'MM/DD/YYYY'
@@ -26,6 +25,11 @@ namespace AnimeListings.Models
         [Column(TypeName = "Date")]//converts to short time 'MM/DD/YYYY'
         public DateTime FinishDate { get; set; }
 
-        public byte[] ImageData { get; set; }
+        public string Synopsis { get; set; }
+
+        public AnimeSeriesPictures Picture { get; set; }
+
+        //IList allows more functionality than ICollection, but more expensive and allows Order by Id
+        public List<AnimeSeriesSE> AnimeSeriesSEs { get; set; } = new List<AnimeSeriesSE>();
     }
 }

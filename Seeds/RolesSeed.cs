@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using AnimeListings.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,27 +9,25 @@ namespace AnimeListings.Seeds
 {
 
     public static class RolesSeed {
-    public static async void SeedData(IServiceProvider serviceProvider)
+    public static async Task SeedData(RoleManager<IdentityRole> roles)
         {
-            using var context = new DatabaseContext(
-                serviceProvider.GetRequiredService<
-                    DbContextOptions<DatabaseContext>>());
 
-            using var roles = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-            var user = await roles.FindByNameAsync("user");
-            var admin = await roles.FindByNameAsync("admin");
-            var siteManager = await roles.FindByNameAsync("admin");
+            var user = await roles.FindByNameAsync("User");
+            var admin = await roles.FindByNameAsync("Admin");
+            var siteManager = await roles.FindByNameAsync("Site Manager");
+            Console.WriteLine("checking for roles!");
             if (user == null) {
-                await roles.CreateAsync(new IdentityRole("user"));
+                Console.WriteLine("User role is null");
+                await roles.CreateAsync(new IdentityRole("Aser"));
             }
             if (admin == null) {
-                await roles.CreateAsync(new IdentityRole("admin"));
+                Console.WriteLine("Admin role is null");
+                await roles.CreateAsync(new IdentityRole("Admin"));
             }
             if (siteManager == null) {
-                await roles.CreateAsync(new IdentityRole("sitemanager"));
+                Console.WriteLine("Site Manager role is null");
+                await roles.CreateAsync(new IdentityRole("Site Manager"));
             }
-            await context.SaveChangesAsync();
         }
     }
 }

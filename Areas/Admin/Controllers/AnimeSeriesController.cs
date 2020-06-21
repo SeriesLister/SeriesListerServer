@@ -74,8 +74,8 @@ namespace AnimeListings.Controllers
             {
                 return NoContent();
             }
-
-            return ConvertToSeriesImage(animeSeries);
+            return null;
+            //return ConvertToSeriesImage(animeSeries);
         }
 
         // POST: AnimeSeries/Edit/5
@@ -99,7 +99,7 @@ namespace AnimeListings.Controllers
 
                 try
                 {
-                    _context.Update(ConvertFromSeriesImage(animeSeries));
+                    //_context.Update(ConvertFromSeriesImage(animeSeries));
                     await _context.SaveChangesAsync();
                     reponse.Result = true;
                 }
@@ -137,16 +137,17 @@ namespace AnimeListings.Controllers
             return _context.AnimeSeries.Any(e => e.Id == id);
         }
 
-        private AnimeSeriesViewModel ConvertToSeriesImage(AnimeSeries animeSeries)
+/*        private AnimeSeriesViewModel ConvertToSeriesImage(AnimeSeries animeSeries)
         {
 
             return new AnimeSeriesViewModel
             {
                 EnglishTitle = animeSeries.EnglishTitle,
-                Episodes = animeSeries.Episodes,
+                Episodes = animeSeries.Episodes[0],
                 FinishDate = animeSeries.FinishDate,
                 Id = animeSeries.Id,
-                ImageData = animeSeries.ImageData == null ? null : Convert.ToBase64String(animeSeries.ImageData),
+                ImageDate = null,
+                //ImageData = animeSeries.ImageData == null ? null : Convert.ToBase64String(animeSeries.ImageData),
                 ReleaseDate = animeSeries.ReleaseDate,
                 Type = animeSeries.Type
             };
@@ -158,13 +159,13 @@ namespace AnimeListings.Controllers
             return new AnimeSeries
             {
                 EnglishTitle = animeSeries.EnglishTitle,
-                Episodes = animeSeries.Episodes,
+                Episodes = animeSeries.Episodes[0],
                 FinishDate = animeSeries.FinishDate,
                 Id = animeSeries.Id,
                 ImageData = animeSeries.ImageData == null ? null : Convert.FromBase64String(Utils.GetSafeBase64ImageString(animeSeries.ImageData)),
                 ReleaseDate = animeSeries.ReleaseDate,
                 Type = animeSeries.Type
             };
-        }
+        }*/
     }
 }

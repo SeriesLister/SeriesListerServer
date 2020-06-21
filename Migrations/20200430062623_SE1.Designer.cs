@@ -3,14 +3,16 @@ using System;
 using AnimeListings.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AnimeListings.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20200430062623_SE1")]
+    partial class SE1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,6 +92,10 @@ namespace AnimeListings.Migrations
             modelBuilder.Entity("AnimeListings.Models.Anime.AnimeSeriesSE", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AnimeSeriesId")
                         .HasColumnType("int");
 
                     b.Property<int>("Episodes")
@@ -99,6 +105,8 @@ namespace AnimeListings.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AnimeSeriesId");
 
                     b.ToTable("AnimeSeriesSE");
                 });
@@ -331,12 +339,9 @@ namespace AnimeListings.Migrations
 
             modelBuilder.Entity("AnimeListings.Models.Anime.AnimeSeriesSE", b =>
                 {
-                    b.HasOne("AnimeListings.Models.AnimeSeries", "AnimeSeries")
-                        .WithMany("AnimeSeriesSEs")
-                        .HasForeignKey("Id")
-                        .HasConstraintName("ForeignKey_SE_AnimeSeries")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("AnimeListings.Models.AnimeSeries", null)
+                        .WithMany("AnimeSeriesSE")
+                        .HasForeignKey("AnimeSeriesId");
                 });
 
             modelBuilder.Entity("AnimeListings.Models.AnimeSeries", b =>

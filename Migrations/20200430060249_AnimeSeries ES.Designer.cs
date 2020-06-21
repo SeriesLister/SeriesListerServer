@@ -9,14 +9,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnimeListings.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20200209073018_useranimelist1")]
-    partial class useranimelist1
+    [Migration("20200430060249_AnimeSeries ES")]
+    partial class AnimeSeriesES
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.1")
+                .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("AnimeListings.Data.SeriesUser", b =>
@@ -89,30 +89,97 @@ namespace AnimeListings.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("AnimeListings.Models.Anime.AnimeSeriesSE", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("Episodes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Season")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AnimeSeriesSE");
+                });
+
             modelBuilder.Entity("AnimeListings.Models.AnimeSeries", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int?>("AnimeSeriesSEId")
+                        .HasColumnType("int");
+
                     b.Property<string>("EnglishTitle")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<int>("Episodes")
+                    b.Property<DateTime>("FinishDate")
+                        .HasColumnType("Date");
+
+                    b.Property<int?>("PictureId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("FinishDate")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<DateTime>("ReleaseDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("Date");
+
+                    b.Property<int>("Seasons")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Synopsis")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("Type")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AnimeSeriesSEId");
+
+                    b.HasIndex("PictureId");
+
                     b.ToTable("AnimeSeries");
+                });
+
+            modelBuilder.Entity("AnimeListings.Models.AnimeSeriesPictures", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("longblob");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AnimeSeriesPicture");
+                });
+
+            modelBuilder.Entity("AnimeListings.Models.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<DateTime>("Provided")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("Revoked")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("AnimeListings.Models.UserAnimeList", b =>
@@ -268,6 +335,17 @@ namespace AnimeListings.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("AnimeListings.Models.AnimeSeries", b =>
+                {
+                    b.HasOne("AnimeListings.Models.Anime.AnimeSeriesSE", "AnimeSeriesSE")
+                        .WithMany()
+                        .HasForeignKey("AnimeSeriesSEId");
+
+                    b.HasOne("AnimeListings.Models.AnimeSeriesPictures", "Picture")
+                        .WithMany()
+                        .HasForeignKey("PictureId");
                 });
 
             modelBuilder.Entity("AnimeListings.Models.UserAnimeList", b =>

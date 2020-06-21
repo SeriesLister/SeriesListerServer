@@ -2,7 +2,7 @@
 
 namespace AnimeListings.Migrations
 {
-    public partial class refreshtoken1 : Migration
+    public partial class SE1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -3,14 +3,16 @@ using System;
 using AnimeListings.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AnimeListings.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20200429075009_Series rework")]
+    partial class Seriesrework
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,22 +89,6 @@ namespace AnimeListings.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("AnimeListings.Models.Anime.AnimeSeriesSE", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Episodes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Season")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AnimeSeriesSE");
-                });
-
             modelBuilder.Entity("AnimeListings.Models.AnimeSeries", b =>
                 {
                     b.Property<int>("Id")
@@ -112,11 +98,11 @@ namespace AnimeListings.Migrations
                     b.Property<string>("EnglishTitle")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<string>("EpisodesS")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.Property<DateTime>("FinishDate")
                         .HasColumnType("Date");
-
-                    b.Property<int?>("PictureId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("Date");
@@ -132,8 +118,6 @@ namespace AnimeListings.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PictureId");
-
                     b.ToTable("AnimeSeries");
                 });
 
@@ -143,10 +127,16 @@ namespace AnimeListings.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("AnimeSeriesId")
+                        .HasColumnType("int");
+
                     b.Property<byte[]>("ImageData")
                         .HasColumnType("longblob");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AnimeSeriesId")
+                        .IsUnique();
 
                     b.ToTable("AnimeSeriesPicture");
                 });
@@ -329,21 +319,13 @@ namespace AnimeListings.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("AnimeListings.Models.Anime.AnimeSeriesSE", b =>
+            modelBuilder.Entity("AnimeListings.Models.AnimeSeriesPictures", b =>
                 {
-                    b.HasOne("AnimeListings.Models.AnimeSeries", "AnimeSeries")
-                        .WithMany("AnimeSeriesSEs")
-                        .HasForeignKey("Id")
-                        .HasConstraintName("ForeignKey_SE_AnimeSeries")
+                    b.HasOne("AnimeListings.Models.AnimeSeries", null)
+                        .WithOne("Picture")
+                        .HasForeignKey("AnimeListings.Models.AnimeSeriesPictures", "AnimeSeriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("AnimeListings.Models.AnimeSeries", b =>
-                {
-                    b.HasOne("AnimeListings.Models.AnimeSeriesPictures", "Picture")
-                        .WithMany()
-                        .HasForeignKey("PictureId");
                 });
 
             modelBuilder.Entity("AnimeListings.Models.UserAnimeList", b =>

@@ -14,11 +14,8 @@ namespace AnimeListings.Seeds
     public static class AnimeSeriesSeeds
     {
 
-        public static async void SeedData(IServiceProvider serviceProvider)
+        public static async Task SeedData(DatabaseContext context)
         {
-            using var context = new DatabaseContext(
-                serviceProvider.GetRequiredService<
-                    DbContextOptions<DatabaseContext>>());
 
             if (context.AnimeSeries.Any())
             {
@@ -33,7 +30,7 @@ namespace AnimeListings.Seeds
                 {
                     EnglishTitle = root[i].GetProperty("title").ToString(),
                     Type = root[i].GetProperty("type").ToString(),
-                    Episodes = root[i].GetProperty("episodes").ToString().Contains("?") ? 0 : Int32.Parse(root[i].GetProperty("episodes").ToString()),
+                    //Episodes = root[i].GetProperty("episodes").ToString().Contains("?") ? 0 : Int32.Parse(root[i].GetProperty("episodes").ToString()),
                     ReleaseDate = GetDateTime(root[i].GetProperty("startDate").ToString()),
                     FinishDate = GetDateTime(root[i].GetProperty("finishDate").ToString()),
                 });
