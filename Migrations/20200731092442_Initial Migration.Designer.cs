@@ -9,14 +9,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnimeListings.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20200430064317_SE3")]
-    partial class SE3
+    [Migration("20200731092442_Initial Migration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.3")
+                .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("AnimeListings.Data.SeriesUser", b =>
@@ -95,7 +95,7 @@ namespace AnimeListings.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int?>("AnimeSeriesId")
+                    b.Property<int>("AnimeSeriesId")
                         .HasColumnType("int");
 
                     b.Property<int>("Episodes")
@@ -123,14 +123,14 @@ namespace AnimeListings.Migrations
                     b.Property<DateTime>("FinishDate")
                         .HasColumnType("Date");
 
+                    b.Property<string>("JapaneseName")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.Property<int?>("PictureId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("Date");
-
-                    b.Property<int>("Seasons")
-                        .HasColumnType("int");
 
                     b.Property<string>("Synopsis")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
@@ -339,9 +339,11 @@ namespace AnimeListings.Migrations
 
             modelBuilder.Entity("AnimeListings.Models.Anime.AnimeSeriesSE", b =>
                 {
-                    b.HasOne("AnimeListings.Models.AnimeSeries", "AnimeSeries")
+                    b.HasOne("AnimeListings.Models.AnimeSeries", null)
                         .WithMany("AnimeSeriesSEs")
-                        .HasForeignKey("AnimeSeriesId");
+                        .HasForeignKey("AnimeSeriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AnimeListings.Models.AnimeSeries", b =>

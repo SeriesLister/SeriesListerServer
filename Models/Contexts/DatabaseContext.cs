@@ -24,11 +24,6 @@ namespace AnimeListings.Data
             // Customize the ASP.NET Core Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Core Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
-            builder.Entity<AnimeSeriesSE>()
-                .HasOne(p => p.AnimeSeries)
-                .WithMany(b => b.AnimeSeriesSEs)
-                .HasForeignKey(p => p.Id)
-                .HasConstraintName("ForeignKey_SE_AnimeSeries");
         }
 
         public DbSet<UserAnimeList> UserAnimeLists { get; set; }

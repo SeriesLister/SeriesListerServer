@@ -4,27 +4,21 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AnimeListings.Migrations
 {
-    public partial class Seriesrework : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "AnimeSeries",
+                name: "AnimeSeriesPicture",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    EnglishTitle = table.Column<string>(nullable: true),
-                    Type = table.Column<string>(nullable: true),
-                    Seasons = table.Column<int>(nullable: false),
-                    ReleaseDate = table.Column<DateTime>(type: "Date", nullable: false),
-                    FinishDate = table.Column<DateTime>(type: "Date", nullable: false),
-                    Synopsis = table.Column<string>(nullable: true),
-                    EpisodesS = table.Column<string>(nullable: true)
+                    ImageData = table.Column<byte[]>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AnimeSeries", x => x.Id);
+                    table.PrimaryKey("PK_AnimeSeriesPicture", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -85,23 +79,28 @@ namespace AnimeListings.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AnimeSeriesPicture",
+                name: "AnimeSeries",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    AnimeSeriesId = table.Column<int>(nullable: false),
-                    ImageData = table.Column<byte[]>(nullable: true)
+                    EnglishTitle = table.Column<string>(nullable: true),
+                    JapaneseName = table.Column<string>(nullable: true),
+                    Type = table.Column<string>(nullable: true),
+                    ReleaseDate = table.Column<DateTime>(type: "Date", nullable: false),
+                    FinishDate = table.Column<DateTime>(type: "Date", nullable: false),
+                    Synopsis = table.Column<string>(nullable: true),
+                    PictureId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AnimeSeriesPicture", x => x.Id);
+                    table.PrimaryKey("PK_AnimeSeries", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AnimeSeriesPicture_AnimeSeries_AnimeSeriesId",
-                        column: x => x.AnimeSeriesId,
-                        principalTable: "AnimeSeries",
+                        name: "FK_AnimeSeries_AnimeSeriesPicture_PictureId",
+                        column: x => x.PictureId,
+                        principalTable: "AnimeSeriesPicture",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -211,6 +210,27 @@ namespace AnimeListings.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AnimeSeriesSE",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Season = table.Column<int>(nullable: false),
+                    Episodes = table.Column<int>(nullable: false),
+                    AnimeSeriesId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnimeSeriesSE", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AnimeSeriesSE_AnimeSeries_AnimeSeriesId",
+                        column: x => x.AnimeSeriesId,
+                        principalTable: "AnimeSeries",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserAnimeLists",
                 columns: table => new
                 {
@@ -239,10 +259,14 @@ namespace AnimeListings.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AnimeSeriesPicture_AnimeSeriesId",
-                table: "AnimeSeriesPicture",
-                column: "AnimeSeriesId",
-                unique: true);
+                name: "IX_AnimeSeries_PictureId",
+                table: "AnimeSeries",
+                column: "PictureId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnimeSeriesSE_AnimeSeriesId",
+                table: "AnimeSeriesSE",
+                column: "AnimeSeriesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -295,7 +319,7 @@ namespace AnimeListings.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AnimeSeriesPicture");
+                name: "AnimeSeriesSE");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -326,6 +350,9 @@ namespace AnimeListings.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "AnimeSeriesPicture");
         }
     }
 }

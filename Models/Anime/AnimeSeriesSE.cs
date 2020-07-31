@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +15,8 @@ namespace AnimeListings.Models.Anime
 
         public int Episodes { get; set; }
 
-        public AnimeSeries AnimeSeries { get; set; }
+        [ForeignKey("AnimeSeriesId")]
+        public int AnimeSeriesId { get; set; }
 
     }
 }
