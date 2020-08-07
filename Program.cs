@@ -19,7 +19,7 @@ namespace AnimeListings
         {
             var host = CreateHostBuilder(args).Build();
 
-            using (var scope = host.Services.CreateScope())
+/*            using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 try
@@ -38,8 +38,8 @@ namespace AnimeListings
                 {
                     var logger = services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(e, "An error occured seeding the DB");
-                }
-            }
+                }*/
+            
 
             host.Run();
         }

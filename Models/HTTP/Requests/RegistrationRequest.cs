@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AnimeListings.Models.ViewModels
+namespace AnimeListings.Models.Requests
 {
-    public class RegistrationViewModel
+    public struct RegistrationRequest
     {
+
         [Required]
         [EmailAddress]
         public string Email { get; set; }

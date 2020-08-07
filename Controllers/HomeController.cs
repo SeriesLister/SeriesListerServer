@@ -15,6 +15,8 @@ using AnimeListings.Tasks;
 using AnimeListings.ViewModels;
 using AnimeListings.Models;
 using System.Linq;
+using AnimeListings.Models.Responses.impl;
+using AnimeListings.Models.Requests;
 
 namespace AnimeListings.Controllers
 {
@@ -78,38 +80,6 @@ namespace AnimeListings.Controllers
             string token = _JWTGenerator.GenerateEncodedToken(user.Id);
 
             return Ok(new { token, refreshToken = refreshToken.Token.ToString() });
-        }
-
-        [HttpPost("register")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Register(RegistrationViewModel model)
-        {
-            Console.WriteLine("email: " + model.Email + " : display: " + model.DisplayName + " : password: " + model.Password);
-            if (ModelState.IsValid)
-            {
-                var user = new SeriesUser()
-                {
-                    UserName = model.DisplayName,
-                    Email = model.Email,
-                };
-                var result = await _userManager.CreateAsync(user, model.Password);
-
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, "User");
-                    return Ok();
-                }
-
-                StringBuilder errors = new StringBuilder();
-                foreach (var error in result.Errors)
-                {
-                    errors.Append(error.Description);
-                    errors.Append(" : ");
-                }
-
-                return Problem(detail: errors.ToString(0, errors.Length - 3));
-            }
-            return NotFound();
         }
 
         [AllowAnonymous]
@@ -178,7 +148,7 @@ namespace AnimeListings.Controllers
                     }
                 }
             }
-            return Problem(detail: "Invalid Email Address or Password");
+            return Ok(new LoginResponse { Success = false, Error = "Invalid email or password." });
         }
 
         private async Task<string> GenerateRefreshToken(string email)

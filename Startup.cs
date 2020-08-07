@@ -42,10 +42,20 @@ namespace AnimeListings
 
             services.AddIdentity<SeriesUser, IdentityRole>(options =>
             {
+                options.Password = new PasswordOptions
+                {
+                    RequiredLength = 8,
+                    RequireUppercase = true,
+                    RequireDigit = true,
+                    RequiredUniqueChars = 1,
+                    RequireLowercase = true,
+                    RequireNonAlphanumeric = true
+                };
                 options.User.RequireUniqueEmail = true;
-                options.Password.RequireDigit = true;
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
                 options.SignIn.RequireConfirmedAccount = false;
                 options.Password.RequiredUniqueChars = 1;
+                options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 8;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireLowercase = true;
