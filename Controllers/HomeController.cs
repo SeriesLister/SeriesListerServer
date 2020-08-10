@@ -100,7 +100,7 @@ namespace AnimeListings.Controllers
             var isUserSignedIn = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
             if (isUserSignedIn.Succeeded)
             {
-                return RedirectToAction("Index", "User");
+                //return RedirectToAction("Index", "User");
             }
             else
             {
@@ -120,7 +120,7 @@ namespace AnimeListings.Controllers
 
                         await _userManager.AddToRoleAsync(user, "User");
                         await _signInManager.SignInAsync(user, false);
-                        return RedirectToAction("Index", "User");
+                        //return RedirectToAction("Index", "User");
                     }
                 }
             }

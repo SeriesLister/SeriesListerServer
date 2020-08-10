@@ -10,6 +10,7 @@ namespace AnimeListings.Areas.Admin.Controllers
     {
         public IActionResult Index()
         {
+            // ReSharper disable once Mvc.ViewNotResolved
             return View();
         }
     }
