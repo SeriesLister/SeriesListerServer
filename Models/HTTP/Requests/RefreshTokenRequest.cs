@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace AnimeListings.ViewModels
+namespace AnimeListings.Models.HTTP.Requests
 {
-    public class RefreshTokenView
+    public class RefreshTokenRequest
     {
         [Required]
         public string Email { get; set; }

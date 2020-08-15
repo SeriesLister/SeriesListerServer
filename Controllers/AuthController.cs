@@ -9,6 +9,7 @@ using AnimeListings.Models.Requests;
 using AnimeListings.Models.Responses;
 using AnimeListings.Models.Responses.impl;
 using AnimeListings.Tasks;
+using AnimeListings.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -106,16 +107,12 @@ namespace AnimeListings.Controllers
             }
 
             string token = _jwtGenerator.GenerateEncodedToken(user.Id);
-            string refreshToken = null;
-            if (request.RememberMe)
-            {
-                refreshToken = await GenerateRefreshToken(user.Email);
-            }
-
+            string refreshToken = await GenerateRefreshToken(user.Email);
+            
             return Ok(new LoginResponse
             {
                 Email = user.Email,
-                UserName = user.UserName,
+                Username = user.UserName,
                 RefreshToken = refreshToken,
                 Token = token,
                 Success = true
@@ -146,6 +143,47 @@ namespace AnimeListings.Controllers
             return Ok(new BasicResponse { Success = isEmailTaken == null });
         }
 
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RefreshTokens(RefreshTokenRequest response)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            Console.WriteLine("Refreshing Token");
+
+            SeriesUser user = await _userManager.FindByEmailAsync(response.Email);
+
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            RefreshToken refreshToken = _context.RefreshTokens.SingleOrDefault(m => m.Token == response.RefreshToken);
+
+            if (refreshToken == null || !refreshToken.IsValid() || refreshToken.Email != user.Email)
+            {
+                if (refreshToken == null)
+                {
+                    return Unauthorized();
+                }
+                
+                _context.RefreshTokens.Remove(refreshToken);
+                await _context.SaveChangesAsync();
+                return Unauthorized();
+            }
+
+            refreshToken.Token = Guid.NewGuid().ToString();
+            refreshToken.Provided = DateTime.UtcNow;
+
+            _context.RefreshTokens.Update(refreshToken);
+            await _context.SaveChangesAsync();
+            string token = _jwtGenerator.GenerateEncodedToken(user.Id);
+            Console.WriteLine("Sending new token!");
+            return Ok(new TokensResponse{ Token = token, RefreshToken = refreshToken.Token, Success = true });
+        }
+        
         private async Task AttemptRoleAdditionAsync(SeriesUser user, string role)
         {
             try

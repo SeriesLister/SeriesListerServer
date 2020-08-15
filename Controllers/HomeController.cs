@@ -43,45 +43,6 @@ namespace AnimeListings.Controllers
             _JWTGenerator = jwtToken;
         }
 
-        [HttpPost("refresh")]
-        [AllowAnonymous]
-        public async Task<IActionResult> RefreshTokens(RefreshTokenView refreshTokenView)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            Console.WriteLine("Refreshing Token");
-
-            SeriesUser user = await _userManager.FindByEmailAsync(refreshTokenView.Email);
-
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            var refreshToken = _context.RefreshTokens.SingleOrDefault(m => m.Token == refreshTokenView.RefreshToken);
-
-            if (refreshToken == null || !refreshToken.IsValid() || refreshToken.Email != user.Email)
-            {
-                if (refreshToken != null)
-                {
-                    _context.RefreshTokens.Remove(refreshToken);
-                    await _context.SaveChangesAsync();
-                }
-                return Unauthorized();
-            }
-
-            refreshToken.Token = Guid.NewGuid().ToString();
-            refreshToken.Provided = DateTime.UtcNow;
-
-            _context.RefreshTokens.Update(refreshToken);
-            await _context.SaveChangesAsync();
-            string token = _JWTGenerator.GenerateEncodedToken(user.Id);
-
-            return Ok(new { token, refreshToken = refreshToken.Token.ToString() });
-        }
-
         [AllowAnonymous]
         public IActionResult GoogleLogin()
         {
@@ -94,8 +55,8 @@ namespace AnimeListings.Controllers
         public async Task<IActionResult> GoogleResponse()
         {
             ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-                return RedirectToAction("Login");
+            /*if (info == null)
+                return RedirectToAction("Login");*/
 
             var isUserSignedIn = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
             if (isUserSignedIn.Succeeded)
@@ -125,30 +86,8 @@ namespace AnimeListings.Controllers
                 }
             }
 
-            return RedirectToAction("Login");
-        }
-
-        [HttpPost("login")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-
-                if (user != null)
-                {
-                    var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
-                    if (result.Succeeded)
-                    {
-                        string token = _JWTGenerator.GenerateEncodedToken(user.Id);
-                        string refreshToken = await GenerateRefreshToken(user.Email);
-                        
-                        return Ok(new { token, user.Email, user.UserName, refreshToken });
-                    }
-                }
-            }
-            return Ok(new LoginResponse { Success = false, Error = "Invalid email or password." });
+            return null;
+            /*return RedirectToAction("Login");*/
         }
 
         private async Task<string> GenerateRefreshToken(string email)
