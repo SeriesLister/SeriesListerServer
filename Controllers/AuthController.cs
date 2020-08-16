@@ -17,9 +17,7 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace AnimeListings.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseController
     {
 
         private readonly DatabaseContext _context;
