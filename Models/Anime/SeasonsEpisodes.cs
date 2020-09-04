@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AnimeListings.Models.Anime
 {
-    public class AnimeSeriesSE
+    public class SeasonsEpisodes
     {
 
         public int Id { get; set; }

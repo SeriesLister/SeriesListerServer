@@ -29,7 +29,7 @@ namespace AnimeListings.Models
         public AnimeSeriesPictures Picture { get; set; }
 
         //IList allows more functionality than ICollection, but more expensive and allows Order by Id
-        public List<AnimeSeriesSE> AnimeSeriesSEs { get; set; } = new List<AnimeSeriesSE>();
+        public List<SeasonsEpisodes> SeasonsEpisodes { get; set; } = new List<SeasonsEpisodes>();
 
         public override string ToString()
         {

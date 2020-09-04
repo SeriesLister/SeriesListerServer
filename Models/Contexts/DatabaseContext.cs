@@ -34,7 +34,7 @@ namespace AnimeListings.Data
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-        public DbSet<AnimeSeriesSE> AnimeSeriesSE { get; set; }
+        public DbSet<SeasonsEpisodes> AnimeSeasonsEpisodes { get; set; }
 
     }
 }

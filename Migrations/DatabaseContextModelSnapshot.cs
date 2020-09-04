@@ -87,7 +87,7 @@ namespace AnimeListings.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("AnimeListings.Models.Anime.AnimeSeriesSE", b =>
+            modelBuilder.Entity("AnimeListings.Models.Anime.SeasonsEpisodes", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -106,7 +106,7 @@ namespace AnimeListings.Migrations
 
                     b.HasIndex("AnimeSeriesId");
 
-                    b.ToTable("AnimeSeriesSE");
+                    b.ToTable("AnimeSeasonsEpisodes");
                 });
 
             modelBuilder.Entity("AnimeListings.Models.AnimeSeries", b =>
@@ -335,10 +335,10 @@ namespace AnimeListings.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("AnimeListings.Models.Anime.AnimeSeriesSE", b =>
+            modelBuilder.Entity("AnimeListings.Models.Anime.SeasonsEpisodes", b =>
                 {
                     b.HasOne("AnimeListings.Models.AnimeSeries", null)
-                        .WithMany("AnimeSeriesSEs")
+                        .WithMany("SeasonsEpisodes")
                         .HasForeignKey("AnimeSeriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
