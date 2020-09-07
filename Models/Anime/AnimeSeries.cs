@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace AnimeListings.Models
 {
@@ -31,6 +32,20 @@ namespace AnimeListings.Models
         //IList allows more functionality than ICollection, but more expensive and allows Order by Id
         public List<SeasonsEpisodes> SeasonsEpisodes { get; set; } = new List<SeasonsEpisodes>();
 
+        public AnimeSeries ToModel(AnimeSeries series)
+        {
+            return new AnimeSeries{
+                EnglishTitle = series.EnglishTitle,
+                FinishDate =  series.FinishDate,
+                JapaneseName = series.JapaneseName,
+                Picture = series.Picture,
+                ReleaseDate = series.ReleaseDate,
+                SeasonsEpisodes = series.SeasonsEpisodes,
+                Synopsis = series.Synopsis,
+                Type = series.Type
+            };
+        }
+        
         public override string ToString()
         {
             return base.ToString();

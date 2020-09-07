@@ -20,7 +20,6 @@ namespace AnimeListings.Filters
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var userId = context.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name);
-            Console.WriteLine("User ID: " + userId);
             if (String.IsNullOrEmpty(Permissions) || userId == null)
             {
                 SetErrorCode(context, 401);

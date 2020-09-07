@@ -52,14 +52,25 @@ namespace AnimeListings.Controllers.Admin.Impl
             {
                 return NotFound();
             }
-            
-            var asyncAdded = _context.AddAsync(series);
-            if (asyncAdded.IsCompletedSuccessfully)
+
+            AnimeSeries findExisting = await _context.AnimeSeries.
+                Include(p => p.Picture).
+                Include(se => se.SeasonsEpisodes).
+                FirstOrDefaultAsync(s =>
+                s.EnglishTitle.Equals(series.EnglishTitle, StringComparison.OrdinalIgnoreCase) ||
+                s.JapaneseName.Equals(series.JapaneseName, StringComparison.OrdinalIgnoreCase
+            ));
+
+            if (findExisting == null)
             {
-                await _context.SaveChangesAsync();
-                return Ok(new BasicResponse{ Success = true});
+                var asyncAdded = _context.AddAsync(new AnimeSeries().ToModel(series));
+                if (asyncAdded.IsCompletedSuccessfully)
+                {
+                    await _context.SaveChangesAsync();
+                    return Ok(new BasicResponse{ Success = true});
+                }
             }
-            return Ok(new BasicResponse{ Success = false, Error = "Duplicate Entry"});
+            return Ok(new BasicResponse{Success = false, Error = "Series already exists"} );
         }
 
         [HttpPatch("update")]
@@ -75,7 +86,10 @@ namespace AnimeListings.Controllers.Admin.Impl
                 return Ok(new BasicResponse {Success = false, Error = "series information is missing" });
             }
             
-            AnimeSeries animeSeries = await _context.AnimeSeries.Include(e => e.SeasonsEpisodes).Include(p => p.Picture).SingleOrDefaultAsync(s => s.Id == series.Id);
+            AnimeSeries animeSeries = await _context.AnimeSeries.
+                Include(e => e.SeasonsEpisodes).
+                Include(p => p.Picture).
+                SingleOrDefaultAsync(s => s.Id == series.Id);
             if (animeSeries == null)
             {
                 return Ok(new BasicResponse {Success = false, Error = "The anime series was deleted prior to request" });
@@ -110,13 +124,14 @@ namespace AnimeListings.Controllers.Admin.Impl
                 return Ok(new BasicResponse {Success = false, Error = "Anime ID less than 1"});
             }
 
-            AnimeSeries animeSeries = await _context.AnimeSeries.FirstOrDefaultAsync(s => s.Id == id);
+            AnimeSeries animeSeries = await _context.AnimeSeries.Include(p => p.Picture).Include(se => se.SeasonsEpisodes).FirstOrDefaultAsync(s => s.Id == id);
             if (animeSeries == null)
             {
                 return Ok(new BasicResponse {Success = false, Error = "Couldn't find anime series with specified ID"});
             }
 
             _context.AnimeSeries.Remove(animeSeries);
+            _context.AnimeSeriesPicture.Remove(animeSeries.Picture);
             await _context.SaveChangesAsync();
             return Ok(new BasicResponse {Success = true});
         }

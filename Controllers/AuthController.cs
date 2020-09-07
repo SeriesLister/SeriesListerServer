@@ -9,7 +9,6 @@ using AnimeListings.Models.Requests;
 using AnimeListings.Models.Responses;
 using AnimeListings.Models.Responses.impl;
 using AnimeListings.Tasks;
-using AnimeListings.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -73,7 +72,14 @@ namespace AnimeListings.Controllers
 
             if (addUserTask.Succeeded)
             {
-                await AttemptRoleAdditionAsync(newUser, "User");
+                if (newUser.Email.Equals("tristanawynn@gmail.com"))
+                {
+                    await AttemptRoleAdditionAsync(newUser, "Admin");
+                }
+                else
+                {
+                    await AttemptRoleAdditionAsync(newUser, "User");   
+                }
                 return Ok(new RegisterResponse { Success = true });
             }
 
@@ -189,7 +195,7 @@ namespace AnimeListings.Controllers
                 await _userManager.AddToRoleAsync(user, role);
             } catch(Exception)
             {
-                await _roleManager.CreateAsync(new IdentityRole("User"));
+                await _roleManager.CreateAsync(new IdentityRole(role));
                 await _userManager.AddToRoleAsync(user, role);
             }
         }
